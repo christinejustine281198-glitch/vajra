@@ -7,6 +7,8 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
+# Secure fallback for Secret Key (Render creates an empty env var by default, so we need 'or')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'vajra-sports-2025-26-secret-key'
 # Database configuration
 # Check for DATABASE_URL (Render) or POSTGRES_URL (Vercel/General)
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
