@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Vajra 2025-26</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">VAJRA Admin</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-section="departments">
+                        <span class="nav-icon">🏢</span>
+                        Departments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="results">
+                        <span class="nav-icon">🏅</span>
+                        Results
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="media">
+                        <span class="nav-icon">📸</span>
+                        Media
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="logout()">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Departments Section -->
+            <section id="departments" class="section active">
+                <div class="page-header">
+                    <h1 class="page-title">Manage Departments</h1>
+                    <p class="page-description">Add and manage participating departments</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Add New Department</h3>
+                    </div>
+                    <form id="addDepartmentForm">
+                        <div class="form-row form-row-full">
+                            <div class="form-group">
+                                <label class="form-label">Department Name</label>
+                                <input type="text" name="name" class="form-input" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-small">Add Department</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Departments List</h3>
+                    </div>
+                    <div class="table-container">
+                        <table id="departmentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Department Name</th>
+                                    <th>Total Points</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results" class="section">
+                <div class="page-header">
+                    <h1 class="page-title">Manage Results</h1>
+                    <p class="page-description">Enter event results and allocate points</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Result</h3>
+                    </div>
+                    <form id="addResultForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Event Name</label>
+                                <input type="text" name="event_name" class="form-input" placeholder="e.g., 100m Sprint"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Event Type</label>
+                                <select name="event_type" class="form-input" required>
+                                    <option value="mens">Men's</option>
+                                    <option value="womens">Women's</option>
+                                    <option value="team">Team</option>
+                                    <option value="individual">Individual</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Department</label>
+                                <select name="department_id" id="resultDeptSelect" class="form-input" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Position</label>
+                                <select name="position" class="form-input" required>
+                                    <option value="1">1st Place</option>
+                                    <option value="2">2nd Place</option>
+                                    <option value="3">3rd Place</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Points Awarded</label>
+                                <input type="number" name="points_awarded" class="form-input" placeholder="e.g., 5"
+                                    required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-small">Add Result</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Results List</h3>
+                    </div>
+                    <div class="table-container">
+                        <table id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Type</th>
+                                    <th>Department</th>
+                                    <th>Position</th>
+                                    <th>Points Awarded</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Media Section -->
+            <section id="media" class="section">
+                <div class="page-header">
+                    <h1 class="page-title">Manage Media</h1>
+                    <p class="page-description">Upload winner and event photos</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Upload Image</h3>
+                    </div>
+                    <form id="addMediaForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Media Type</label>
+                                <select name="media_type" class="form-input" required>
+                                    <option value="winner">Winner Photo</option>
+                                    <option value="event">Event Photo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Event Name (Optional)</label>
+                                <input type="text" name="event_name" class="form-input" placeholder="e.g., 100m Sprint">
+                            </div>
+                        </div>
+                        <div class="form-row form-row-full">
+                            <div class="form-group">
+                                <label class="form-label">Caption</label>
+                                <input type="text" name="caption" class="form-input" placeholder="Add a description">
+                            </div>
+                        </div>
+                        <div class="form-row form-row-full">
+                            <div class="form-group">
+                                <label class="form-label">Image</label>
+                                <div class="file-upload">
+                                    <input type="file" name="image" id="imageInput" accept="image/*" required>
+                                    <div class="file-upload-label">
+                                        📷 Click to select image
+                                    </div>
+                                </div>
+                                <div id="imagePreview" class="image-preview" style="display: none;">
+                                    <img id="previewImg" src="" alt="Preview">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-small">Upload Image</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Media List</h3>
+                    </div>
+                    <div class="table-container">
+                        <table id="mediaTable">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Event</th>
+                                    <th>Caption</th>
+                                    <th>Image</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+
+</html>
