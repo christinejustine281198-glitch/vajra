@@ -76,7 +76,13 @@ def init_db():
 def db_setup():
     try:
         init_db()
-        return jsonify({"message": "Database initialized successfully (Tables created & default admin checked)."})
+        # Force update admin password
+        admin = Admin.query.filter_by(username='admin').first()
+        if admin:
+            admin.password_hash = generate_password_hash('Soevajrasports')
+            db.session.commit()
+            return jsonify({"message": "Database initialized. Admin password reset to 'Soevajrasports'."})
+        return jsonify({"message": "Database initialized."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

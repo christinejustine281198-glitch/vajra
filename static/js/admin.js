@@ -1,9 +1,9 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = '/api';
 
 // Check authentication on load
 window.addEventListener('DOMContentLoaded', async () => {
     try {
-        const response = await fetch('http://localhost:5000/admin/check', {
+        const response = await fetch('/admin/check', {
             credentials: 'include'
         });
 
@@ -44,7 +44,7 @@ function initNavigation() {
 // Logout
 async function logout() {
     try {
-        await fetch('http://localhost:5000/admin/logout', {
+        await fetch('/admin/logout', {
             method: 'POST',
             credentials: 'include'
         });
