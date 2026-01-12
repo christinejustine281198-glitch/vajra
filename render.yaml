@@ -2,11 +2,13 @@ databases:
   - name: vajra-db
     databaseName: vajra
     user: vajra_user
+    plan: free
 
 services:
   - type: web
     name: vajra-points
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
