@@ -95,15 +95,22 @@ def recalculate_points():
 # Authentication Routes
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
-    data = request.get_json()
-    admin = Admin.query.filter_by(username=data.get('username')).first()
-    
-    if admin and check_password_hash(admin.password_hash, data.get('password')):
-        session['admin_logged_in'] = True
-        session['admin_id'] = admin.id
-        return jsonify({'success': True, 'message': 'Login successful'})
-    
-    return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
+    try:
+        data = request.get_json()
+        print(f"Login attempt for: {data.get('username')}") # Debug log
+        
+        admin = Admin.query.filter_by(username=data.get('username')).first()
+        
+        if admin and check_password_hash(admin.password_hash, data.get('password')):
+            session['admin_logged_in'] = True
+            session['admin_id'] = admin.id
+            return jsonify({'success': True, 'message': 'Login successful'})
+        
+        print("Invalid credentials or admin not found") # Debug log
+        return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
+    except Exception as e:
+        print(f"Login Error: {str(e)}") # Debug log
+        return jsonify({'success': False, 'message': f'Server Error: {str(e)}'}), 500
 
 @app.route('/admin/logout', methods=['POST'])
 def admin_logout():
