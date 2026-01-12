@@ -5,6 +5,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os
+import cloudinary
+import cloudinary.uploader
+
+# Cloudinary Configuration
+cloudinary.config(
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key = os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
+)
 
 app = Flask(__name__)
 # Secure fallback for Secret Key (Render creates an empty env var by default, so we need 'or')
@@ -15,6 +24,11 @@ db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if db_url and db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+# If running on Render, ENFORCE Postgres. Do not allow silent fallback to SQLite.
+# If running on Render, ENFORCE Postgres. Do not allow silent fallback to SQLite.
+if os.environ.get('RENDER') and not db_url:
+    raise RuntimeError("DATABASE_URL is missing on Render! Check your environment variables.")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -245,13 +259,21 @@ def manage_media():
         filename = secure_filename(file.filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"{timestamp}_{filename}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
+
+        # Cloudinary Upload
+        if os.environ.get('CLOUDINARY_CLOUD_NAME'):
+            upload_result = cloudinary.uploader.upload(file, public_id=filename.split('.')[0])
+            image_path = upload_result['secure_url']
+        else:
+            # Local Upload
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            image_path = f'uploads/{filename}'
         
         media = Media(
             event_name=request.form.get('event_name') or None,
             media_type=request.form.get('media_type', 'event'),
-            image_path=f'uploads/{filename}',
+            image_path=image_path,
             caption=request.form.get('caption', '')
         )
         db.session.add(media)

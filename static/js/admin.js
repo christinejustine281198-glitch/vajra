@@ -230,7 +230,7 @@ async function loadMedia() {
                 <td>${m.media_type}</td>
                 <td>${m.event_name || 'N/A'}</td>
                 <td>${m.caption || '-'}</td>
-                <td><img src="/static/${m.image_path}" style="width: 100px; border-radius: 8px;"></td>
+                <td><img src="${m.image_path.startsWith('http') ? m.image_path : '/static/' + m.image_path}" style="width: 100px; border-radius: 8px;"></td>
                 <td>
                     <div class="action-btns">
                         <button class="btn-icon btn-delete" onclick="deleteMedia(${m.id})">🗑️</button>

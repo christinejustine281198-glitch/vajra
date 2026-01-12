@@ -238,7 +238,7 @@ async function loadWinners() {
 
         container.innerHTML = winners.map(winner => `
             <div class="gallery-item">
-                <img src="/static/${winner.image_path}" alt="${winner.caption || 'Winner'}">
+                <img src="${winner.image_path.startsWith('http') ? winner.image_path : '/static/' + winner.image_path}" alt="${winner.caption || 'Winner'}">
                 <div class="gallery-caption">
                     ${winner.caption || winner.event_name}
                 </div>
@@ -270,7 +270,7 @@ async function loadGallery() {
 
         container.innerHTML = events.map(event => `
             <div class="gallery-item">
-                <img src="/static/${event.image_path}" alt="${event.caption || 'Event Photo'}">
+                <img src="${event.image_path.startsWith('http') ? event.image_path : '/static/' + event.image_path}" alt="${event.caption || 'Event Photo'}">
                 <div class="gallery-caption">
                     ${event.caption || event.event_name || 'Event Photo'}
                 </div>
