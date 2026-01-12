@@ -7,8 +7,14 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'vajra-sports-2025-26-secret-key'  # Change in production
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+# Database configuration
+# Check for DATABASE_URL (Render) or POSTGRES_URL (Vercel/General)
+db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+
+if db_url and db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -62,6 +68,15 @@ def init_db():
             db.session.add(admin)
             db.session.commit()
             print("Default admin created (username: admin, password: admin123)")
+
+# Special route for periodic Database initialization/reset on Vercel
+@app.route('/db-setup')
+def db_setup():
+    try:
+        init_db()
+        return jsonify({"message": "Database initialized successfully (Tables created & default admin checked)."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Helper function to recalculate points
 def recalculate_points():
@@ -261,6 +276,8 @@ def admin_dashboard():
     return render_template('admin_dashboard.html')
 
 if __name__ == '__main__':
-    init_db()
+    # Only run init_db locally if not using Postgres
+    if not (os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')):
+        init_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

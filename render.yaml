@@ -1,0 +1,20 @@
+databases:
+  - name: vajra-db
+    databaseName: vajra
+    user: vajra_user
+
+services:
+  - type: web
+    name: vajra-points
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vajra-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.0
