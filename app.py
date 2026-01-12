@@ -28,7 +28,7 @@ if db_url and db_url.startswith("postgres://"):
 # If running on Render, ENFORCE Postgres. Do not allow silent fallback to SQLite.
 # If running on Render, ENFORCE Postgres. Do not allow silent fallback to SQLite.
 if os.environ.get('RENDER') and not db_url:
-    raise RuntimeError("DATABASE_URL is missing on Render! Check your environment variables.")
+    raise RuntimeError("DATABASE_URL is missing! Go to Render Dashboard -> Environment -> Add DATABASE_URL.")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
